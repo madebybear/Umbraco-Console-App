@@ -17,3 +17,28 @@
 
 # ImageProcessor DiskCache 
 **/App_Data/cache/
+
+# Packages 
+**/[Pp]ackages/
+
+# VS
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Dd]ebug*/
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
+
+
