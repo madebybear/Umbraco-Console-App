@@ -37,9 +37,6 @@ namespace My.Umbraco.ConsoleApp
         }
     }
 
-    
-
-
     internal class ConsoleApplicationBase : UmbracoApplicationBase
     {
         protected override IBootManager GetBootManager()
