@@ -30,7 +30,7 @@ to the current output folder e.g. _/Debug/bin/config/*.config_.
 
 - **App.config** - The app.config is actually a direct copy of the _web.config_ that can be found in the root of  `My.Umbraco.Website` (I manually cut and pasted the contents of the web.config _into_ the app.config). 
 
-- **Even more postbuild events...** -- Finally, since my machine is x64 and this example is using an Sql CE .SDF for the Umbraco Database, I actually needed to copy the _/bin/x64/_ folder (that contains the x64 binaries for SQL Compact Edition)  from `My.Umbraco.Website` so we don't get an error during startup that complains about [File Version Mismatch between ADO.NET](https://support.microsoft.com/en-gb/help/974247/fix-you-receive-an-error-message-when-you-run-a-sql-server-compact-3-5)
+- **Even more postbuild events...** -- Finally, since my machine is x64 and this example is using an Sql CE .SDF for the Umbraco Database, I actually needed to copy the _/bin/x86/_ folder (that contains the x86 binaries for SQL Compact Edition)  from `My.Umbraco.Website` so we don't get an error during startup that complains about [File Version Mismatch between ADO.NET versions](https://support.microsoft.com/en-gb/help/974247/fix-you-receive-an-error-message-when-you-run-a-sql-server-compact-3-5)
 
 `My.Umbraco.Website` - A vanilla Umbraco 7.6.5 with the default starter package installed;
 - To access the back office, open the .sln in Visual Studio and set the startup project to be `My.Umbraco.Website`, you can login with

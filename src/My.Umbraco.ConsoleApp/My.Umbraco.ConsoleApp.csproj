@@ -284,10 +284,8 @@ xcopy /y "$(SolutionDir)src\My.Umbraco.Website\config\Dashboard.config" "$(Targe
 xcopy /y "$(SolutionDir)src\My.Umbraco.Website\config\FileSystemProviders.config" "$(TargetDir)config\*.*"
 xcopy /y "$(SolutionDir)src\My.Umbraco.Website\config\umbracoSettings.config" "$(TargetDir)config\*.*"
 
-
-xcopy /y /e /i "$(SolutionDir)src\My.Umbraco.Website\bin\amd64" "$(TargetDir)amd64"
 xcopy /y /e /i "$(SolutionDir)src\My.Umbraco.Website\bin\x86" "$(TargetDir)x86"
-xcopy /y /e /i "$(SolutionDir)src\My.Umbraco.Website\bin\roslyn" "$(TargetDir)roslyn"</PostBuildEvent>
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
