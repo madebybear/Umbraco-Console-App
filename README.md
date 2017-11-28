@@ -1,6 +1,6 @@
 # Umbraco-Console-App
 
-A simple console application that makes use of Umbraco services within [Umbraco 7.6.5](https://our.umbraco.org/contribute/releases/765). 
+A simple console application that makes use of Umbraco services within [Umbraco 7.7.6](https://our.umbraco.org/contribute/releases/776). 
 
 ## Use Case
 
@@ -48,7 +48,7 @@ There are a [some](https://github.com/sitereactor/umbraco-console-example) [exam
 
 ## Built Using
 
-* [Umbraco 7.6.5](https://our.umbraco.org/contribute/releases/765) 
+* [Umbraco 7.7.6](https://our.umbraco.org/contribute/releases/776) 
 * [Visual Studio](https://www.visualstudio.com/)
 
 ## Authors
