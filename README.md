@@ -19,7 +19,7 @@ A simple console application that makes use of Umbraco services within [Umbraco 
 `My.Umbraco.Console` - A simple `Program.cs` that will list the root / child nodes of `My.Umbraco.Website`. 
 
 ### Postbuild Events
-In order for Umbraco to work, there is a post buconfiguration files when it boots up, so there are some postbuild events that copy the following from `My.Umbraco.Website` to the current output folder e.g. _/Debug/bin/config/*.config_. 
+In order for Umbraco to work, there is a a postbuild event that copies the .config files from `My.Umbraco.Website` to the current output folder e.g. _/Debug/bin/config/*.config_. 
 
 ### App.config
 The app.config is actually a direct copy of the _web.config_ that can be found in the root of  `My.Umbraco.Website` (I manually copied the contents of the web.config _into_ the app.config). 
