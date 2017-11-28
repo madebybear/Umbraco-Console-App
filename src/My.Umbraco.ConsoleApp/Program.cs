@@ -41,8 +41,9 @@ namespace My.Umbraco.ConsoleApp
     {
         protected override IBootManager GetBootManager()
         {
+            // These lines are needed if you're using a connection string that includes |DataDirectory|
+            // you should be able to remove/comment them out if you're using SQL Server and not an .SDF
             var dataDirectory = new DirectoryInfo("..\\..\\..\\..\\src\\My.Umbraco.Website\\App_Data\\");
-
             AppDomain.CurrentDomain.SetData("DataDirectory", dataDirectory.FullName);
 
             return new ConsoleBootManager(this);
