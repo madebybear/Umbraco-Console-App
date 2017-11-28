@@ -4,7 +4,7 @@ A simple console application that makes use of Umbraco services within [Umbraco 
 
 ## Use Case
 
-- You have a custom Umbraco website that you've built. Using a windows scheduled task, you want run via a console application and programmatically use the [Umbraco Services](https://our.umbraco.org/documentation/Reference/Management/Services/) to modify your content.
+- You have a custom Umbraco website that you've built. Using a windows scheduled task, you want run a umbraco console application and programmatically use the [Umbraco Services](https://our.umbraco.org/documentation/Reference/Management/Services/) to modify your content.
 
 ## Prerequisites
 
