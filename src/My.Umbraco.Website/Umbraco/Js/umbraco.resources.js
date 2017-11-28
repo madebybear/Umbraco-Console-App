@@ -1672,6 +1672,7 @@
                 if (!value) {
                     return '';
                 }
+                value = value.replace('#', '');
                 return umbRequestHelper.resourcePromise($http.get(umbRequestHelper.getApiUrl('entityApiBaseUrl', 'GetSafeAlias', {
                     value: value,
                     camelCase: camelCase

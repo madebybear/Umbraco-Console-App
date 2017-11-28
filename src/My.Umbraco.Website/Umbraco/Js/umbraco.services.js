@@ -428,12 +428,12 @@
  * @ngdoc service
  * @name umbraco.services.assetsService
  *
- * @requires $q 
+ * @requires $q
  * @requires angularHelper
- *  
+ *
  * @description
  * Promise-based utillity service to lazy-load client-side dependencies inside angular controllers.
- * 
+ *
  * ##usage
  * To use, simply inject the assetsService into any controller that needs it, and make
  * sure the umbraco.services module is accesible - which it should be by default.
@@ -444,7 +444,7 @@
  *                 //this code executes when the dependencies are done loading
  *          });
  *      });
- * </pre> 
+ * </pre>
  *
  * You can also load individual files, which gives you greater control over what attibutes are passed to the file, as well as timeout
  *
@@ -464,11 +464,11 @@
  *                 //loadcss cannot determine when the css is done loading, so this will trigger instantly
  *          });
  *      });
- * </pre>  
+ * </pre>
  */
     angular.module('umbraco.services').factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope, $http) {
         var initAssetsLoaded = false;
-        var appendRnd = function (url) {
+        function appendRnd(url) {
             //if we don't have a global umbraco obj yet, the app is bootstrapping
             if (!Umbraco.Sys.ServerVariables.application) {
                 return url;
@@ -477,7 +477,8 @@
             var _op = url.indexOf('?') > 0 ? '&' : '?';
             url = url + _op + 'umb__rnd=' + rnd;
             return url;
-        };
+        }
+        ;
         function convertVirtualPath(path) {
             //make this work for virtual paths
             if (path.startsWith('~/')) {
@@ -500,7 +501,7 @@
                     return this.loadedAssets[path];
                 }
             },
-            /** 
+            /**
             Internal method. This is called when the application is loading and the user is already authenticated, or once the user is authenticated.
             There's a few assets the need to be loaded for the application to function but these assets require authentication to load.
         */
@@ -527,10 +528,10 @@
          *
          * @description
          * Injects a file as a stylesheet into the document head
-         * 
+         *
          * @param {String} path path to the css file to load
          * @param {Scope} scope optional scope to pass into the loader
-         * @param {Object} keyvalue collection of attributes to pass to the stylesheet element  
+         * @param {Object} keyvalue collection of attributes to pass to the stylesheet element
          * @param {Number} timeout in milliseconds
          * @returns {Promise} Promise object which resolves when the file has loaded
          */
@@ -565,10 +566,10 @@
          *
          * @description
          * Injects a file as a javascript into the document
-         * 
+         *
          * @param {String} path path to the js file to load
          * @param {Scope} scope optional scope to pass into the loader
-         * @param {Object} keyvalue collection of attributes to pass to the script element  
+         * @param {Object} keyvalue collection of attributes to pass to the script element
          * @param {Number} timeout in milliseconds
          * @returns {Promise} Promise object which resolves when the file has loaded
          */
@@ -602,8 +603,8 @@
          * @methodOf umbraco.services.assetsService
          *
          * @description
-         * Injects a collection of files, this can be ONLY js files
-         * 
+         * Injects a collection of css and js files
+         *
          *
          * @param {Array} pathArray string array of paths to the files to load
          * @param {Scope} scope optional scope to pass into the loader
@@ -614,48 +615,68 @@
                 if (!angular.isArray(pathArray)) {
                     throw 'pathArray must be an array';
                 }
+                // Check to see if there's anything to load, resolve promise if not
                 var nonEmpty = _.reject(pathArray, function (item) {
                     return item === undefined || item === '';
                 });
-                //don't load anything if there's nothing to load
-                if (nonEmpty.length > 0) {
-                    var promises = [];
-                    var assets = [];
-                    //compile a list of promises
-                    //blocking
-                    _.each(nonEmpty, function (path) {
-                        path = convertVirtualPath(path);
-                        var asset = service._getAssetPromise(path);
-                        //if not previously loaded, add to list of promises
-                        if (asset.state !== 'loaded') {
-                            if (asset.state === 'new') {
-                                asset.state = 'loading';
-                                assets.push(asset);
-                            }
-                            //we need to always push to the promises collection to monitor correct 
-                            //execution                        
-                            promises.push(asset.deferred.promise);
-                        }
-                    });
-                    //gives a central monitoring of all assets to load
-                    promise = $q.all(promises);
-                    _.each(assets, function (asset) {
-                        LazyLoad.js(appendRnd(asset.path), function () {
-                            asset.state = 'loaded';
-                            if (!scope) {
-                                asset.deferred.resolve(true);
-                            } else {
-                                angularHelper.safeApply(scope, function () {
-                                    asset.deferred.resolve(true);
-                                });
-                            }
-                        });
-                    });
-                } else {
-                    //return and resolve
+                if (nonEmpty.length === 0) {
                     var deferred = $q.defer();
                     promise = deferred.promise;
                     deferred.resolve(true);
+                    return promise;
+                }
+                //compile a list of promises
+                //blocking
+                var promises = [];
+                var assets = [];
+                _.each(nonEmpty, function (path) {
+                    path = convertVirtualPath(path);
+                    var asset = service._getAssetPromise(path);
+                    //if not previously loaded, add to list of promises
+                    if (asset.state !== 'loaded') {
+                        if (asset.state === 'new') {
+                            asset.state = 'loading';
+                            assets.push(asset);
+                        }
+                        //we need to always push to the promises collection to monitor correct
+                        //execution
+                        promises.push(asset.deferred.promise);
+                    }
+                });
+                //gives a central monitoring of all assets to load
+                promise = $q.all(promises);
+                // Split into css and js asset arrays, and use LazyLoad on each array
+                var cssAssets = _.filter(assets, function (asset) {
+                    return asset.path.match(/(\.css$|\.css\?)/ig);
+                });
+                var jsAssets = _.filter(assets, function (asset) {
+                    return asset.path.match(/(\.js$|\.js\?)/ig);
+                });
+                function assetLoaded(asset) {
+                    asset.state = 'loaded';
+                    if (!scope) {
+                        asset.deferred.resolve(true);
+                        return;
+                    }
+                    angularHelper.safeApply(scope, function () {
+                        asset.deferred.resolve(true);
+                    });
+                }
+                if (cssAssets.length > 0) {
+                    var cssPaths = _.map(cssAssets, function (asset) {
+                        return appendRnd(asset.path);
+                    });
+                    LazyLoad.css(cssPaths, function () {
+                        _.each(cssAssets, assetLoaded);
+                    });
+                }
+                if (jsAssets.length > 0) {
+                    var jsPaths = _.map(jsAssets, function (asset) {
+                        return appendRnd(asset.path);
+                    });
+                    LazyLoad.js(jsPaths, function () {
+                        _.each(jsAssets, assetLoaded);
+                    });
                 }
                 return promise;
             }
@@ -2586,6 +2607,25 @@
 		 */
             getCurrent: function () {
                 return nArray;
+            },
+            /**
+		 * @ngdoc method
+		 * @name umbraco.services.historyService#getLastAccessedItemForSection
+		 * @methodOf umbraco.services.historyService
+		 *
+		 * @description
+		 * Method to return the item that was last accessed in the given section
+		 *
+         * @param {string} sectionAlias Alias of the section to return the last accessed item for.
+		 */
+            getLastAccessedItemForSection: function (sectionAlias) {
+                for (var i = 0, len = nArray.length; i < len; i++) {
+                    var item = nArray[i];
+                    if (item.link.indexOf(sectionAlias + '/') === 0) {
+                        return item;
+                    }
+                }
+                return null;
             }
         };
     });
@@ -8123,8 +8163,8 @@
                     var propGroups = _.find(genericTab.properties, function (item) {
                         return item.alias === '_umb_membergroup';
                     });
-                    saveModel.email = propEmail.value;
-                    saveModel.username = propLogin.value;
+                    saveModel.email = propEmail.value.trim();
+                    saveModel.username = propLogin.value.trim();
                     saveModel.password = this.formatChangePasswordModel(propPass.value);
                     var selectedGroups = [];
                     for (var n in propGroups.value) {

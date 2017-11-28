@@ -733,7 +733,7 @@
 * @name umbraco.directives.directive:umbSections
 * @restrict E
 **/
-    function sectionsDirective($timeout, $window, navigationService, treeService, sectionService, appState, eventsService, $location) {
+    function sectionsDirective($timeout, $window, navigationService, treeService, sectionService, appState, eventsService, $location, historyService) {
         return {
             restrict: 'E',
             // restrict to an element
@@ -862,7 +862,9 @@
                     if (section.routePath) {
                         $location.path(section.routePath);
                     } else {
-                        $location.path(section.alias).search('');
+                        var lastAccessed = historyService.getLastAccessedItemForSection(section.alias);
+                        var path = lastAccessed != null ? lastAccessed.link : section.alias;
+                        $location.path(path).search('');
                     }
                 };
                 scope.sectionDblClick = function (section) {
@@ -5579,7 +5581,7 @@ Opens an overlay to show a custom YSOD. </br>
             },
             //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
             // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
-            template: '<li ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' + '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" >' + //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
+            template: '<li ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' + '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >' + //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' + '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' + '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' + //NOTE: These are the 'option' elipses
             '<a class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' + '<div ng-show="node.loading" class="l"><div></div></div>' + '</div>' + '</li>',
@@ -8860,7 +8862,7 @@ Use this directive to generate a thumbnail grid of media items.
                     if (scope.itemMinWidth) {
                         itemMinWidth = scope.itemMinWidth;
                     }
-                    if (scope.itemMinWidth) {
+                    if (scope.itemMinHeight) {
                         itemMinHeight = scope.itemMinHeight;
                     }
                     for (var i = 0; scope.items.length > i; i++) {
@@ -9587,6 +9589,27 @@ Use this directive to generate a pagination.
             return directive;
         }
         angular.module('umbraco.directives').directive('umbPagination', PaginationDirective);
+    }());
+    (function () {
+        'use strict';
+        // comes from https://codepen.io/jakob-e/pen/eNBQaP
+        // works fine with Angular 1.6.5 - alas not with 1.1.5 - binding issue
+        function PasswordToggleDirective($compile) {
+            var directive = {
+                restrict: 'A',
+                scope: {},
+                link: function (scope, elem, attrs) {
+                    scope.tgl = function () {
+                        elem.attr('type', elem.attr('type') === 'text' ? 'password' : 'text');
+                    };
+                    var lnk = angular.element('<a data-ng-click="tgl()">Toggle</a>');
+                    $compile(lnk)(scope);
+                    elem.wrap('<div class="password-toggle"/>').after(lnk);
+                }
+            };
+            return directive;
+        }
+        angular.module('umbraco.directives').directive('umbPasswordToggle', PasswordToggleDirective);
     }());
     /**
 @ngdoc directive
